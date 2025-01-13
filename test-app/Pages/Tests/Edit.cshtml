@@ -1,9 +1,52 @@
 @page
-@model Pages.Tests.EditModel
-<h2>Editar Test</h2>
-<form method="post">
-    <label>Título del Test:</label>
-    <input type="text" name="Title" value="@Model.Test.Title" required />
-    <button type="submit">Guardar Cambios</button>
-</form>
-<a href="/Index">Volver al inicio</a>
+@model test_app.Pages.Tests.EditModel
+@{
+    ViewData["Title"] = "Editar Test";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Editar Test</h2>
+
+    <!-- ✅ Mostrar error si existe -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form method="post" class="card p-4 shadow">
+        <!-- ✅ Campo oculto para el ID del Test -->
+        <input type="hidden" asp-for="Test.Id" />
+
+        <!-- ✅ Título del Test -->
+        <div class="mb-3">
+            <label class="form-label">Título del Test:</label>
+            <input asp-for="Test.Title" class="form-control" required />
+        </div>
+
+        <hr />
+        <h4>Editar Preguntas y Respuestas</h4>
+
+        <!-- ✅ Renderizar Preguntas Existentes -->
+        @for (var i = 0; i < Model.Questions.Count; i++)
+        {
+            <div class="mb-3 question-block">
+                <!-- Campo Oculto para el ID de la Pregunta -->
+                <input type="hidden" name="Questions[@i].Id" value="@Model.Questions[i].Id" />
+
+                <label class="form-label">Pregunta @(i + 1):</label>
+                <input type="text" name="Questions[@i].Text" value="@Model.Questions[i].Text" class="form-control" required />
+                
+                <label class="form-label">Respuesta Correcta:</label>
+                <input type="text" name="Questions[@i].CorrectAnswer" value="@Model.Questions[i].CorrectAnswer" class="form-control" required />
+            </div>
+            <hr />
+        }
+
+        <!-- ✅ Botones de acción -->
+        <button type="submit" class="btn btn-primary w-100 mt-3">Guardar Cambios</button>
+        <a asp-page="/Index" class="btn btn-secondary mt-3">Cancelar</a>
+    </form>
+</div>
+
+
+

@@ -5,26 +5,38 @@
 }
 
 <div class="container mt-5">
-    <h2 class="text-center">Jugar: @Model.Test.Title</h2>
+    <h2 class="text-center mb-4">@Model.Test.Title</h2>
 
-    <!-- Mensaje de resultado -->
-    @if (TempData["Message"] != null)
+    <!-- ✅ Mostrar errores -->
+    @if (TempData["Error"] != null)
     {
-        <div class="alert alert-info">@TempData["Message"]</div>
+        <div class="alert alert-danger">@TempData["Error"]</div>
     }
 
-    <form method="post" class="card p-4 shadow-sm">
-        @for (var i = 0; i < Model.Questions.Count; i++)
-        {
-            <div class="mb-3">
-                <p><strong>@Model.Questions[i].Text</strong></p>
-                <input type="hidden" name="QuestionIds[@i]" value="@Model.Questions[i].Id" />
-                <input type="text" name="UserAnswers[@i]" class="form-control" required />
-            </div>
-        }
+    <!-- ✅ Mostrar los resultados si ya se enviaron -->
+    @if (Model.ShowResults)
+    {
+        <div class="alert alert-success text-center">
+            <h4>Puntaje Obtenido: @Model.Score / @Model.Questions.Count</h4>
+        </div>
+        <a asp-page="/Index" class="btn btn-secondary w-100 mt-3">Volver al Inicio</a>
+    }
+    else
+    {
+        <!-- ✅ Formulario para responder las preguntas -->
+        <form method="post" class="card p-4 shadow">
+            <input type="hidden" name="testId" value="@Model.Test.Id" />
+            
+            @for (var i = 0; i < Model.Questions.Count; i++)
+            {
+                <div class="mb-3">
+                    <label class="form-label"><b>Pregunta @(i + 1):</b> @Model.Questions[i].Text</label>
+                    <input type="text" name="UserAnswers" class="form-control" required />
+                </div>
+            }
 
-        <button type="submit" class="btn btn-primary w-100">Enviar Respuestas</button>
-    </form>
-
-    <a asp-page="/Index" class="btn btn-secondary mt-3">Volver al Inicio</a>
+            <!-- ✅ Botón para enviar respuestas -->
+            <button type="submit" class="btn btn-primary w-100 mt-3">Enviar Respuestas</button>
+        </form>
+    }
 </div>

@@ -1,9 +1,81 @@
 @page
-@model Pages.Tests.CreateModel
-<h2>Crear Nuevo Test</h2>
-<form method="post">
-    <label>Título del Test:</label>
-    <input type="text" name="Title" required />
-    <button type="submit">Crear</button>
-</form>
-<a href="/Index">Volver al inicio</a>
+@model test_app.Pages.Tests.CreateModel
+@{
+    ViewData["Title"] = "Crear un Nuevo Test";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Crear un Nuevo Test</h2>
+
+    <!-- ✅ Mostrar Mensajes de Error -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form method="post" class="card p-4 shadow">
+        <!-- ✅ Título del Test -->
+        <div class="mb-3">
+            <label class="form-label">Título del Test:</label>
+            <input asp-for="Test.Title" class="form-control" required />
+        </div>
+
+        <hr />
+        <h4>Añadir Preguntas y Respuestas</h4>
+        
+        <!-- ✅ Contenedor de Preguntas -->
+        <div id="questionsContainer">
+            <!-- ✅ Renderizar preguntas existentes si existen -->
+            @for (var i = 0; i < Model.Questions.Count; i++)
+            {
+                <div class="mb-3 question-block">
+                    <label class="form-label">Pregunta @(i + 1):</label>
+                    <input type="text" name="Questions[@i].Text" value="@Model.Questions[i].Text" class="form-control" required />
+                    
+                    <label class="form-label">Respuesta Correcta:</label>
+                    <input type="text" name="Questions[@i].CorrectAnswer" value="@Model.Questions[i].CorrectAnswer" class="form-control" required />
+                </div>
+                <hr />
+            }
+        </div>
+
+        <!-- ✅ Input oculto para manejar el contador -->
+        <input type="hidden" id="questionCount" value="@Model.Questions.Count" />
+
+        <!-- ✅ Botón para Agregar Pregunta -->
+        <button type="button" class="btn btn-info mt-3" onclick="addQuestion()">Añadir Pregunta</button>
+
+        <!-- ✅ Botón para Guardar -->
+        <button type="submit" class="btn btn-success w-100 mt-3">Guardar Test y Preguntas</button>
+    </form>
+
+    <a asp-page="/Index" class="btn btn-secondary mt-3">Cancelar</a>
+</div>
+
+
+
+<script>
+    function addQuestion() {
+        const container = document.getElementById("questionsContainer");
+        const questionCountInput = document.getElementById("questionCount");
+
+        // ✅ Incrementar el contador para mantener el índice
+        let questionIndex = parseInt(questionCountInput.value);
+        questionCountInput.value = questionIndex + 1;
+
+        // ✅ Añadir la nueva pregunta con el índice actual
+        const newQuestionHtml = `
+            <div class="mb-3 question-block">
+                <label class="form-label">Pregunta ${questionIndex + 1}:</label>
+                <input type="text" name="Questions[${questionIndex}].Text" class="form-control" required />
+                
+                <label class="form-label">Respuesta Correcta:</label>
+                <input type="text" name="Questions[${questionIndex}].CorrectAnswer" class="form-control" required />
+                <hr />
+            </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', newQuestionHtml);
+    }
+</script>
+

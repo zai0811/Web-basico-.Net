@@ -10,69 +10,83 @@ namespace test_app.Pages.Tests
     {
         private readonly ApplicationDbContext _context;
 
+        [BindProperty]
         public Test Test { get; set; }
+
+        [BindProperty]
         public List<Question> Questions { get; set; }
+
+        [BindProperty]
+        public List<string> UserAnswers { get; set; } = new List<string>();
+
+        [BindProperty]
+        public int Score { get; set; }
+
+        [BindProperty]
+        public bool ShowResults { get; set; } = false;
 
         public PlayModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
+        // ✅ Cargar Test y Preguntas
         public async Task<IActionResult> OnGetAsync(int id)
         {
             Test = await _context.Tests
                 .Include(t => t.Questions)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-            if (Test == null || Test.Questions.Count == 0)
+            if (Test == null)
             {
-                TempData["Message"] = "El test no tiene preguntas o no fue encontrado.";
+                TempData["Error"] = "El test no existe o fue eliminado.";
                 return RedirectToPage("/Index");
             }
 
-            Questions = Test.Questions;
+            Questions = Test.Questions.ToList();
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int[] QuestionIds, string[] UserAnswers)
+        // ✅ Mostrar resultados después de enviar respuestas
+        public async Task<IActionResult> OnPostAsync(int testId)
         {
-            int score = 0;
-            List<string> resultados = new List<string>();
+            Test = await _context.Tests
+                .Include(t => t.Questions)
+                .FirstOrDefaultAsync(t => t.Id == testId);
 
-            for (int i = 0; i < QuestionIds.Length; i++)
+            if (Test == null)
             {
-                var question = await _context.Questions.FindAsync(QuestionIds[i]);
+                TempData["Error"] = "El test no fue encontrado.";
+                return RedirectToPage("/Index");
+            }
 
-                if (question != null && question.CorrectAnswer.Trim().ToLower() == UserAnswers[i].Trim().ToLower())
+            Questions = Test.Questions.ToList();
+            Score = 0;
+
+            // ✅ Calcular el puntaje
+            for (int i = 0; i < Questions.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(UserAnswers[i]) &&
+                    Questions[i].CorrectAnswer.Equals(UserAnswers[i], StringComparison.OrdinalIgnoreCase))
                 {
-                    score++;
-                    resultados.Add($"✅ Pregunta {i + 1}: Correcta.");
-                }
-                else
-                {
-                    resultados.Add($"❌ Pregunta {i + 1}: Incorrecta. Respuesta Correcta: {question.CorrectAnswer}");
+                    Score++;
                 }
             }
 
-            var username = User.Identity.Name;
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-
-            // Guardar el resultado en la base de datos
+            // ✅ Guardar resultado en la base de datos
             var result = new Result
             {
-                UserId = user.Id,
-                TestId = QuestionIds[0], 
-                Score = score
+                UserId = _context.Users.FirstOrDefault(u => u.Username == User.Identity.Name)?.Id ?? 0,
+                TestId = testId,
+                Score = Score
             };
 
             _context.Results.Add(result);
             await _context.SaveChangesAsync();
 
-            // ✅ Mostrar los resultados del test y la puntuación
-            TempData["Message"] = $"Tu puntuación es {score}/{QuestionIds.Length}." + string.Join("", resultados);
-            return RedirectToPage("/Tests/Play", new { id = QuestionIds[0] });
+            // ✅ Mostrar resultados en la misma página
+            ShowResults = true;
+            return Page();
         }
     }
 }
-
-
