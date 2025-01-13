@@ -1,31 +1,30 @@
 ﻿@page
-
-@model IndexModel
+@model test_app.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
 }
 
-<h1>Welcome @User.Identity.Name!</h1>
+<div class="container mt-5">
+    <h2 class="text-center">¡Bienvenido @User.Identity.Name!</h2>
+    <p class="text-center">Aquí puedes administrar tus tests.</p>
 
-<a href="/Tests/Create">Crear un nuevo Test</a> |
-<a href="/Logout">Cerrar Sesión</a>
+    <div class="text-center mb-4">
+        <a class="btn btn-primary" asp-page="/Tests/Create">Crear un Nuevo Test</a>
+        <a class="btn btn-danger" asp-page="/Logout">Cerrar Sesión</a>
+    </div>
 
-<h2>Tus Tests Creados</h2>
-@if (Model.Tests.Any())
-{
-    <ul>
+    <h4 class="mt-5">Tus Tests Creados</h4>
+    <ul class="list-group">
         @foreach (var test in Model.Tests)
         {
-            <li>
-                @test.Title 
-                <a href="/Tests/Play?id=@test.Id">Jugar</a> | 
-                <a href="/Tests/Edit?id=@test.Id">Editar</a> | 
-                <a href="/Tests/Delete?id=@test.Id">Eliminar</a>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                @test.Title
+                <div>
+                    <a class="btn btn-sm btn-warning" asp-page="/Tests/Play" asp-route-id="@test.Id">Jugar</a>
+                    <a class="btn btn-sm btn-info" asp-page="/Tests/Edit" asp-route-id="@test.Id">Editar</a>
+                    <a class="btn btn-sm btn-danger" asp-page="/Tests/Delete" asp-route-id="@test.Id">Eliminar</a>
+                </div>
             </li>
         }
     </ul>
-}
-else
-{
-    <p>No has creado ningún test todavía.</p>
-}
+</div>

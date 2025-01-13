@@ -4,26 +4,27 @@
     ViewData["Title"] = "Jugar Test";
 }
 
-<h2>Jugar Test: @Model.Test.Title</h2>
+<div class="container mt-5">
+    <h2 class="text-center">Jugar: @Model.Test.Title</h2>
 
-<!-- ✅ Mostrar mensaje de resultado -->
-@if (TempData["Message"] != null)
-{
-    <div style="color: green; font-weight: bold;">
-        @TempData["Message"]
-    </div>
-}
-
-<form method="post">
-    @for (var i = 0; i < Model.Questions.Count; i++)
+    <!-- Mensaje de resultado -->
+    @if (TempData["Message"] != null)
     {
-        <p><strong>@Model.Questions[i].Text</strong></p>
-        <input type="hidden" name="QuestionIds[@i]" value="@Model.Questions[i].Id" />
-        <label>Respuesta:</label>
-        <input type="text" name="UserAnswers[@i]" required />
+        <div class="alert alert-info">@TempData["Message"]</div>
     }
 
-    <button type="submit">Enviar Respuestas</button>
-</form>
+    <form method="post" class="card p-4 shadow-sm">
+        @for (var i = 0; i < Model.Questions.Count; i++)
+        {
+            <div class="mb-3">
+                <p><strong>@Model.Questions[i].Text</strong></p>
+                <input type="hidden" name="QuestionIds[@i]" value="@Model.Questions[i].Id" />
+                <input type="text" name="UserAnswers[@i]" class="form-control" required />
+            </div>
+        }
 
-<a href="/Index">Volver al Inicio</a>
+        <button type="submit" class="btn btn-primary w-100">Enviar Respuestas</button>
+    </form>
+
+    <a asp-page="/Index" class="btn btn-secondary mt-3">Volver al Inicio</a>
+</div>
