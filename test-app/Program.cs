@@ -1,33 +1,38 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using test_app.Data;
-
 using Pomelo.EntityFrameworkCore.MySql;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar la conexión a MySQL con Pomelo
+// Configuración de conexión a MySQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 25))));
 
-builder.Services.AddRazorPages();
-builder.Services.AddAuthentication("CookieAuth")
-    .AddCookie("CookieAuth", config =>
+// ✅ Configurar la autenticación con esquema consistente
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
     {
-        config.Cookie.Name = "UserLoginCookie";
-        config.LoginPath = "/Login";
+        options.Cookie.Name = "UserLoginCookie";
+        options.LoginPath = "/Login";  // Redirige si no está autenticado
+        options.AccessDeniedPath = "/AccessDenied"; 
     });
+
+builder.Services.AddAuthorization();
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
+
+// Habilitar la autenticación y autorización en orden correcto
+app.UseAuthentication();  // ✅ Primero autenticación
+app.UseAuthorization();   // ✅ Luego autorización
 
 app.MapRazorPages();
 app.Run();
-
 
 

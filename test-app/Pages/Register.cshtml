@@ -1,5 +1,15 @@
 @page
 @model test_app.Pages.RegisterModel
+<!-- ✅ Mostrar mensajes de error -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div style="color: red;">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
 <h2>Registro</h2>
 <form method="post">
     <label>Usuario:</label>

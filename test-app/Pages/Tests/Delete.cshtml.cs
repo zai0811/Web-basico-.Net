@@ -3,9 +3,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using test_app.Data;
 using test_app.Models;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace test_app.Pages.Tests
 {
+    [Authorize] // 🔒 Protegido
+
     public class DeleteModel : PageModel
     {
         private readonly ApplicationDbContext _context;

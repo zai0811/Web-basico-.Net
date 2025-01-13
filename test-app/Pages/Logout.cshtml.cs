@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Threading.Tasks;
 
 namespace test_app.Pages
 {
@@ -8,9 +10,11 @@ namespace test_app.Pages
     {
         public async Task<IActionResult> OnGet()
         {
-            await HttpContext.SignOutAsync("CookieAuth");
+            // Utilizar el esquema de autenticación predeterminado
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToPage("/Login");
         }
     }
 }
+
 
