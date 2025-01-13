@@ -1,0 +1,31 @@
+﻿@page
+
+@model IndexModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>Welcome @User.Identity.Name!</h1>
+
+<a href="/Tests/Create">Crear un nuevo Test</a> |
+<a href="/Logout">Cerrar Sesión</a>
+
+<h2>Tus Tests Creados</h2>
+@if (Model.Tests.Any())
+{
+    <ul>
+        @foreach (var test in Model.Tests)
+        {
+            <li>
+                @test.Title 
+                <a href="/Tests/Play?id=@test.Id">Jugar</a> | 
+                <a href="/Tests/Edit?id=@test.Id">Editar</a> | 
+                <a href="/Tests/Delete?id=@test.Id">Eliminar</a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No has creado ningún test todavía.</p>
+}

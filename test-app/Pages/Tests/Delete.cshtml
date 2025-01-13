@@ -1,0 +1,18 @@
+@page
+@model test_app.Pages.Tests.DeleteModel
+<h2>¿Estás seguro de que deseas eliminar este test?</h2>
+
+@if (Model != null)
+{
+    <form method="post">
+        <input type="hidden" name="id" value="@Request.Query["id"]" />
+        <button type="submit">Eliminar</button>
+    </form>
+}
+else
+{
+    <p>El test no existe o ya ha sido eliminado.</p>
+}
+
+<a href="/Index">Volver al Inicio</a>
+

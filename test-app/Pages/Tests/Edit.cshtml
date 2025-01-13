@@ -1,0 +1,9 @@
+@page
+@model Pages.Tests.EditModel
+<h2>Editar Test</h2>
+<form method="post">
+    <label>Título del Test:</label>
+    <input type="text" name="Title" value="@Model.Test.Title" required />
+    <button type="submit">Guardar Cambios</button>
+</form>
+<a href="/Index">Volver al inicio</a>
